@@ -43,3 +43,4 @@ Cypress.Commands.add('cadastrarUsuarios', (username, usermail, senha, administra
         failOnStatusCode: false
     })
 })
+
