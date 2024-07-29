@@ -1,11 +1,15 @@
 /// <reference types="cypress" />
 import { faker } from '@faker-js/faker';
+import contrato from '../contracts/usuarios.contracts'
 
 describe('Testes da Funcionalidade Usuários', () => {
 
   it('Deve validar contrato de usuários', () => {
-    //TODO: 
+    cy.request('usuarios').then(response => {
+      return contrato.validateAsync(response.body)
+  })
   });
+
 
   it('Deve listar usuários cadastrados', () => {
     //TODO: 
@@ -37,24 +41,18 @@ describe('Testes da Funcionalidade Usuários', () => {
         expect(response.status).equal(400)
         expect(response.body.message).to.equal('Este email já está sendo usado')
       });
-
-
-
-
-
+      failOnStatusCode: false
   })
 
-  it.only('Deve editar um usuário previamente cadastrado', () => {
+  it('Deve editar um usuário previamente cadastrado', () => {
 
     let useremail = `${faker.internet.email()}`
     cy.cadastrarUsuarios('Fulano da Silva', faker.internet.email(), 'teste', 'true')
       .then(response => {
         let id = response.body._id
-
         cy.request({
           method: 'PUT',
           url: `usuarios/${id}`,
-
           body:
           {
             "nome": 'Fulano da Silva',
@@ -84,34 +82,39 @@ describe('Testes da Funcionalidade Usuários', () => {
             "email": 'beltrano@qa.com.br',
             "password": 'teste',
             "administrador": 'true'
-          }      
-        })
-          .then(response => {
+          }
+        }).then(response => {
             expect(response.body.message).to.equal('Este email já está sendo usado')
             expect(response.status).equal(400)
           })
       })
-    
-
   });
-
-
-
-
-
-
 
   it('Deve deletar um usuário previamente cadastrado', () => {
     //TODO: 
+    let useremail = `${faker.internet.email()}`
+    cy.cadastrarUsuarios('Fulano da Silva', faker.internet.email(), 'teste', 'true')
+      .then(response => {
+        let id = response.body._id
 
+        cy.request({
+          method: 'DELETE',
+          url: `usuarios/${id}`,
 
-
-
-
-
-
+          body:
+          {
+            "nome": 'Fulano da Silva',
+            "email": faker.internet.email(),
+            "password": 'teste',
+            "administrador": 'true'
+          }
+        }).then(response => {
+          expect(response.body.message).to.equal('Registro excluído com sucesso')
+          expect(response.status).equal(200)
+        })
+      })
   });
+});
 
 
 
-})
